@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MEDON · Guías clínicas y herramientas interactivas</title>
+<link rel="icon" href="/assets/medon-logo.png">
+<link rel="preconnect" href="https://zmsbapcofmzolaxvocsn.supabase.co">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<script src="/vendor/supabase.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#fbfcfb;font-family:'Manrope',system-ui,sans-serif;color:#0f2e26;-webkit-font-smoothing:antialiased}
+a{color:#0b4a3c;text-decoration:none}a:hover{color:#2e9e62}
+[hidden]{display:none!important}
+.screen{min-height:100vh;display:flex;flex-direction:column}
+.split{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr))}
+.hero{background:#0b4a3c;color:#eaf5ef;padding:56px clamp(28px,6vw,80px);display:flex;flex-direction:column;justify-content:center;gap:24px}
+.hero h1{margin:0;font-size:clamp(34px,4.2vw,52px);line-height:1.08;font-weight:800;letter-spacing:-.02em;text-wrap:balance;max-width:520px}
+.hero p{margin:0;font-size:18px;line-height:1.6;color:#c4e6d3;max-width:520px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:24px}
+.chips span{font-size:12px;font-weight:600;padding:6px 12px;border-radius:999px;border:1px solid rgba(159,216,182,.35);color:#c4e6d3}
+.center{flex:1;display:flex;align-items:center;justify-content:center;padding:48px 24px}
+form,.box{width:100%;max-width:400px;display:flex;flex-direction:column;gap:20px}
+.logo{width:320px;max-width:100%;height:116px;overflow:hidden;position:relative}
+.logo img{position:absolute;width:377px;left:-28px;top:-137px;mix-blend-mode:multiply}
+.logo.sm{width:160px;height:58px}.logo.sm img{width:188px;left:-14px;top:-68px}
+h2{margin:0;font-size:26px;font-weight:800;letter-spacing:-.01em}
+.muted{margin:0;font-size:15px;color:#557066;line-height:1.5}
+label{display:flex;flex-direction:column;gap:8px;font-size:13px;font-weight:600;color:#33524a}
+input{font:inherit;font-size:16px;font-weight:500;padding:14px 16px;border:1.5px solid #d5e2dc;border-radius:12px;background:#fff;color:#0f2e26;outline:none}
+input:focus{border-color:#2e9e62;box-shadow:0 0 0 4px rgba(46,158,98,.15)}
+.btn{font:inherit;font-size:16px;font-weight:700;padding:15px 28px;border:0;border-radius:12px;background:#0b4a3c;color:#fff;cursor:pointer}
+.btn:hover{background:#13634f}.btn:disabled{opacity:.6;cursor:wait}
+.link{font:inherit;font-size:14px;font-weight:700;color:#2e9e62;background:none;border:0;padding:0;cursor:pointer}
+.err{font-size:14px;color:#b4233a;font-weight:600}.ok{font-size:14px;color:#0b4a3c;font-weight:600}
+.row{display:flex;justify-content:center;gap:6px;font-size:14px;color:#557066}
+header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px clamp(20px,4vw,48px);background:#fff;border-bottom:1px solid #e3ebe7}
+.steps{display:flex;flex-wrap:wrap;gap:8px;font-size:13px;font-weight:700;color:#7a938a}.steps .on{color:#0b4a3c}
+@media (max-width:720px){.steps{display:none}}
+.legal{font-size:13px;color:#7a938a;text-align:center;line-height:1.5}.legal a{color:#0b4a3c;font-weight:700}
+.wrap{flex:1;width:100%;max-width:960px;margin:0 auto;padding:clamp(40px,6vw,64px) 24px;display:flex;flex-direction:column;gap:32px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:20px;align-items:start}
+.card{font:inherit;text-align:left;cursor:pointer;border-radius:20px;padding:26px;background:#fff;color:#0f2e26;display:flex;flex-direction:column;gap:14px;border:2px solid #e3ebe7}
+.card:hover{border-color:#9fd8b6}.card.sel{border-color:#2e9e62;box-shadow:0 0 0 4px rgba(46,158,98,.14)}
+.badge{font-size:12px;font-weight:700;padding:5px 11px;border-radius:999px;background:#e3f4ea;color:#0b4a3c}
+.price{font-size:38px;font-weight:800;letter-spacing:-.02em}
+.sum{background:#fff;border:1.5px solid #e3ebe7;border-radius:20px;padding:28px;display:flex;flex-direction:column;gap:16px}
+.line{display:flex;justify-content:space-between;gap:12px;font-size:15px}
+.specs{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:20px}
+.spec{font:inherit;text-align:left;cursor:pointer;border:0;border-radius:20px;padding:28px;min-height:190px;display:flex;flex-direction:column;justify-content:space-between;gap:28px;color:#fff;transition:transform .18s,box-shadow .18s}
+.spec:hover{transform:translateY(-3px);box-shadow:0 16px 32px -14px rgba(11,74,60,.45)}
+.topic{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:24px 28px;border-radius:16px;background:#fff;border:1.5px solid #e3ebe7;color:#0f2e26;cursor:pointer;font:inherit;text-align:left;width:100%}
+.topic:hover{border-color:#2e9e62}
+.topic{flex-wrap:wrap}.topic>div{flex:1 1 220px;min-width:0}
+@media (max-width:600px){
+  header{flex-wrap:wrap;padding:12px 16px}
+  header [data-email]{display:none}
+  .topic{padding:20px;gap:16px}
+  .topic>span{flex:1 1 100%;text-align:center;padding:14px 18px!important}
+  .wrap{padding:28px 16px}
+  .spec{min-height:160px;padding:22px}
+}
+.dark{background:#0b4a3c;color:#eaf5ef}
+.modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:20px}
+.mode{font:inherit;text-align:left;cursor:pointer;border:1.5px solid #e3ebe7;border-radius:24px;padding:clamp(26px,4vw,36px);background:#fff;color:#0f2e26;display:flex;flex-direction:column;gap:18px;min-height:260px;transition:transform .18s,box-shadow .18s,border-color .18s}
+.mode:hover{transform:translateY(-3px);border-color:#9fd8b6;box-shadow:0 18px 36px -18px rgba(11,74,60,.45)}
+.mode .tag{align-self:flex-start;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:12px;font-weight:600;letter-spacing:.12em;padding:6px 12px;border-radius:999px}
+.mode .go{margin-top:auto;align-self:flex-start;font-size:15px;font-weight:700;padding:12px 20px;border-radius:12px;color:#fff}
+.pw{position:relative;display:block}
+.pw input{width:100%;padding-right:64px}
+.pw button{position:absolute;right:8px;top:50%;transform:translateY(-50%);font:inherit;font-size:13px;font-weight:700;color:#0b4a3c;background:#eef4f1;border:0;border-radius:8px;padding:7px 10px;cursor:pointer}
+.logo-login{width:100%;max-width:340px;align-self:center;position:relative;animation:medonFlota 4.5s ease-in-out infinite;transform-origin:50% 60%}
+.logo-login img{display:block;width:100%;height:auto;mix-blend-mode:multiply}
+.logo-login .ekg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.logo-login .ekg path{fill:none;stroke-linecap:round;stroke-linejoin:round}
+.logo-login .ekg .base{stroke:#17a356;stroke-width:6}
+.logo-login .ekg .glow{stroke:#c8ffd9;stroke-width:5;stroke-dasharray:16 84;stroke-dashoffset:100;filter:drop-shadow(0 0 4px #3cff8a) drop-shadow(0 0 9px #2bd46f);animation:medonPulso 2.2s linear infinite}
+@keyframes medonPulso{0%{stroke-dashoffset:100;opacity:0}8%{opacity:1}70%{stroke-dashoffset:0;opacity:1}78%,100%{stroke-dashoffset:0;opacity:0}}
+@keyframes medonFlota{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-5px) scale(1.015)}}
+@media (prefers-reduced-motion:reduce){.logo-login,.logo-login .ekg .glow{animation:none}.logo-login .ekg .glow{display:none}}
+</style>
+</head>
+<body>
+
+<!-- CARGANDO -->
+<section id="s-cargando" class="screen"><div class="center"><p class="muted">Cargando…</p></div></section>
+
+<!-- LOGIN -->
+<section id="s-login" class="screen split" hidden>
+  <div class="hero">
+    <h1>Decisiones clínicas, guiadas paso a paso.</h1>
+    <p>Plataforma médica de acceso a guías de práctica clínica con herramientas interactivas para la toma de decisiones y el manejo del paciente.</p>
+    <p style="font-size:15px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#9fd8b6">Medicina interactiva</p>
+    <p style="font-size:16px;font-weight:700;color:#fff">Prueba gratis 2 días · Sin tarjeta</p>
+    <div class="chips"><span>Cardiología</span><span>Neumología</span><span>Endocrinología</span><span>Anestesiología</span><span>Pediatría</span><span>Infectología</span></div>
+  </div>
+  <div class="center">
+    <form id="f-login">
+      <div class="logo-login"><img src="/assets/medon-logo-login.png" decoding="async" alt="MedON Clinic"><svg class="ekg" viewBox="0 0 900 357" aria-hidden="true"><defs><clipPath id="ekgO"><ellipse cx="624" cy="166" rx="62" ry="54"/></clipPath></defs><g clip-path="url(#ekgO)"><rect x="550" y="105" width="160" height="125" fill="#fff"/><path class="base" d="M560,168 L586,168 Q593,154 600,168 L608,168 L611,175 L619,118 L631,212 L637,168 L647,168 Q658,144 669,168 L700,168"/><path class="glow" pathLength="100" d="M560,168 L586,168 Q593,154 600,168 L608,168 L611,175 L619,118 L631,212 L637,168 L647,168 Q658,144 669,168 L700,168"/></g></svg></div>
+      <div><h2>Iniciar sesión</h2><p class="muted">Ingresa con tu correo y contraseña.</p></div>
+      <label>Correo electrónico<input name="email" type="email" required placeholder="tu@correo.com" autocomplete="email"></label>
+      <label>Contraseña<input name="clave" type="password" required placeholder="••••••••" autocomplete="current-password"></label>
+      <div class="err" data-msg></div>
+      <button class="btn" type="submit">Entrar</button>
+      <button class="link" type="button" id="b-olvide">¿Olvidaste tu contraseña?</button>
+      <div class="row" style="padding-top:18px;border-top:1px solid #e3ebe7">¿No tienes cuenta?<button class="link" type="button" data-ir="registro">Crear cuenta</button></div>
+    </form>
+  </div>
+</section>
+
+<!-- REGISTRO -->
+<section id="s-registro" class="screen" hidden>
+  <header><div class="logo sm"><img src="/assets/medon-logo.webp" decoding="async" alt="MEDON"></div><div class="steps"><span class="on">1 Cuenta</span><span>·</span><span>2 Plan</span><span>·</span><span>3 Pago</span></div></header>
+  <div class="center">
+    <form id="f-registro">
+      <div><h2>Crea tu cuenta</h2><p class="muted">2 días gratis con acceso completo. Sin tarjeta.</p></div>
+      <label>Nombre completo<input name="nombre" required placeholder="Dra. Laura Gómez" autocomplete="name"></label>
+      <label>Correo electrónico<input name="email" type="email" required placeholder="laura@correo.com" autocomplete="email"></label>
+      <label>Contraseña<input name="clave" type="password" required minlength="6" placeholder="Mínimo 6 caracteres" autocomplete="new-password"></label>
+      <div class="err" data-msg></div>
+      <button class="btn" type="submit">Empezar prueba gratis</button>
+      <p class="legal" style="margin:0">Al crear tu cuenta declaras ser médico o estudiante de medicina y aceptas los <a href="/terminos/" target="_blank">Términos y condiciones</a> y la <a href="/privacidad/" target="_blank">Política de privacidad</a>.</p>
+      <div class="row">¿Ya tienes cuenta?<button class="link" type="button" data-ir="login">Inicia sesión</button></div>
+    </form>
+  </div>
+</section>
+
+<!-- CONFIRMA CORREO -->
+<section id="s-confirma" class="screen" hidden>
+  <div class="center"><div class="box" style="text-align:center;align-items:center">
+    <div class="logo"><img src="/assets/medon-logo.webp" decoding="async" alt="MEDON"></div>
+    <h2>Revisa tu correo</h2>
+    <p class="muted">Te enviamos un enlace para confirmar tu cuenta. Ábrelo para empezar tus 2 días gratis.</p>
+    <button class="btn" data-ir="login">Ir a iniciar sesión</button>
+  </div></div>
+</section>
+
+<!-- NUEVA CONTRASEÑA -->
+<section id="s-nuevaclave" class="screen" hidden>
+  <div class="center">
+    <form id="f-nuevaclave">
+      <div class="logo"><img src="/assets/medon-logo.webp" decoding="async" alt="MEDON"></div>
+      <h2>Nueva contraseña</h2>
+      <label>Contraseña nueva<input name="clave" type="password" required minlength="6" autocomplete="new-password"></label>
+      <div class="err" data-msg></div>
+      <button class="btn" type="submit">Guardar</button>
+    </form>
+  </div>
+</section>
+
+<!-- PLANES -->
+<section id="s-planes" class="screen" hidden>
+  <header><div class="logo sm"><img src="/assets/medon-logo.webp" decoding="async" alt="MEDON"></div><div style="display:flex;align-items:center;gap:16px"><div class="steps"><span>1 Cuenta</span><span>·</span><span class="on">2 Plan</span><span>·</span><span>3 Pago</span></div><button class="link" data-salir>Salir</button></div></header>
+  <div class="wrap" style="max-width:880px">
+    <div style="text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center">
+      <span id="m-finprueba" class="badge" hidden>Tu prueba gratis terminó</span>
+      <h1 style="margin:0;font-size:clamp(30px,3.6vw,42px);font-weight:800;letter-spacing:-.02em">Elige tu plan</h1>
+      <p class="muted" style="font-size:17px;max-width:520px">Acceso completo a todas las especialidades, guías y herramientas interactivas.</p>
+    </div>
+    <div class="grid2">
+      <button class="card" data-plan="mensual">
+        <span style="font-size:20px;font-weight:800">Mensual</span>
+        <div><span class="price">$79.900</span> <span class="muted">COP / mes</span></div>
+        <span class="muted" style="font-size:14px">≈ US$19,99 · Cancela cuando quieras</span>
+      </button>
+      <button class="card sel" data-plan="anual">
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:20px;font-weight:800">Anual</span><span class="badge">Ahorra 30%</span></div>
+        <div><span class="price">$671.900</span> <span class="muted">COP / año</span></div>
+        <span class="muted" style="font-size:14px">Equivale a $55.992 / mes · ≈ US$167,99</span>
+      </button>
+    </div>
+    <div style="display:flex;justify-content:center"><button class="btn" data-ir="pago" style="padding:16px 40px">Continuar al pago</button></div>
+  </div>
+</section>
+
+<!-- PAGO -->
+<section id="s-pago" class="screen" hidden>
+  <header><div class="logo sm"><img src="/assets/medon-logo.webp" decoding="async" alt="MEDON"></div><div class="steps"><span>1 Cuenta</span><span>·</span><span>2 Plan</span><span>·</span><span class="on">3 Pago</span></div></header>
+  <div class="wrap grid2">
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <button class="link" data-ir="planes" style="align-self:flex-start">← Cambiar plan</button>
+      <h1 style="margin:0;font-size:30px;font-weight:800">Método de pago</h1>
+      <button class="card sel" data-metodo="mercadopago_auto"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><span style="font-size:17px;font-weight:700">Tarjeta · renovación automática</span><span class="badge">Recomendado</span></div><span class="muted" style="font-size:14px">Crédito o débito Visa, Mastercard, Amex o Diners. Se cobra solo cada periodo; cancela cuando quieras.</span></button>
+      <button class="card" data-metodo="mercadopago"><span style="font-size:17px;font-weight:700">PSE, Nequi o tarjeta · pago único</span><span class="muted" style="font-size:14px">Pagas una vez por el periodo elegido. Te avisamos por correo antes de que venza.</span></button>
+      
+      <p class="muted" style="font-size:13px">Serás redirigido a una página segura para completar el pago. MEDON no almacena datos de tu tarjeta. Al pagar aceptas los <a href="/terminos/" target="_blank">Términos</a>, incluida la política de no reembolso.</p>
+    </div>
+    <div class="sum">
+      <span style="font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#2e9e62;font-weight:700">Resumen</span>
+      <div class="line"><span id="r-plan"></span><span id="r-precio" style="font-weight:700"></span></div>
+      <div class="line muted" style="font-size:14px"><span>Cuenta</span><span data-email></span></div>
+      <div class="line" style="padding-top:16px;border-top:1px solid #e3ebe7;align-items:baseline"><b>Total</b><span id="r-total" style="font-size:26px;font-weight:800"></span></div>
+      <div class="err" id="m-pago"></div>
+      <button class="btn" id="b-pagar">Pagar</button>
+      <span class="muted" id="r-nota" style="font-size:13px;text-align:center"></span>
+    </div>
+  </div>
+</section>
+
+<!-- PAGO OK -->
+<section id="s-pagook" class="screen dark" hidden>
+  <div class="center"><div class="box" style="text-align:center;align-items:center;max-width:480px">
+    <span style="width:72px;height:72px;border-radius:50%;background:#2e9e62;color:#fff;display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:800">✓</span>
+    <h1 style="margin:0;font-size:clamp(30px,4vw,40px);font-weight:800">¡Pago recibido!</h1>
+    <p id="m-pagook" style="margin:0;font-size:17px;line-height:1.6;color:#c4e6d3">Estamos activando tu cuenta…</p>
+    <button class="btn" id="b-entrar" style="background:#fff;color:#0b4a3c" hidden>Entrar a la plataforma</button>
+  </div></div>
+</section>
+
+<!-- PLATAFORMA -->
+<section id="s-app" class="screen" hidden>
+  <header>
+    <div class="logo sm" style="cursor:pointer" data-inicio><img src="/assets/medon-logo.webp" decoding="async" alt="MEDON"></div>
+    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:flex-end">
+      <span class="muted" style="font-size:14px;font-weight:600;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" data-name></span>
+      <button class="link" id="b-portal" hidden>Cancelar renovación</button>
+      <button class="btn" data-salir style="font-size:14px;padding:9px 16px;background:#fff;color:#0b4a3c;border:1.5px solid #d5e2dc">Salir</button>
+    </div>
+  </header>
+  <div id="b-prueba" hidden style="display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;padding:12px 20px;background:#e3f4ea;color:#0b4a3c;font-size:15px;font-weight:600">
+    <span id="t-prueba"></span>
+    <button class="btn" id="b-suscribir" style="font-size:14px;padding:9px 18px">Suscribirme</button>
+  </div>
+  <main class="wrap" style="max-width:1180px">
+    <div id="v-modo" style="display:flex;flex-direction:column;gap:32px">
+      <div style="display:flex;flex-direction:column;gap:12px;max-width:720px">
+        <div style="font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:#2e9e62;font-weight:700">Bienvenido a MedON</div>
+        <h1 style="margin:0;font-size:clamp(30px,3.6vw,44px);line-height:1.1;font-weight:800;letter-spacing:-.02em">¿Cómo quieres estudiar hoy?</h1>
+        <p class="muted" style="font-size:17px">Elige tu espacio. Puedes cambiar en cualquier momento tocando el logo de MedON.</p>
+      </div>
+      <div class="modes">
+        <button class="mode" data-modo="student">
+          <span class="tag" style="background:#e8eefb;color:#22468f">MEDON STUDENT</span>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <span style="font-size:clamp(28px,3.4vw,36px);font-weight:800;letter-spacing:-.02em">Student</span>
+            <span class="muted" style="font-size:16px;line-height:1.55">Ciencias básicas y clínicas para estudiantes: fisiopatología, semiología y bases del razonamiento clínico, con modelos interactivos.</span>
+          </div>
+          <span class="go" style="background:#22468f">Entrar a Student →</span>
+        </button>
+        <button class="mode" data-modo="medical">
+          <span class="tag" style="background:#e3f4ea;color:#0b4a3c">MEDON MEDICAL</span>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <span style="font-size:clamp(28px,3.4vw,36px);font-weight:800;letter-spacing:-.02em">Medical</span>
+            <span class="muted" style="font-size:16px;line-height:1.55">Guías de práctica clínica actualizadas, simuladores y calculadoras para la toma de decisiones y el manejo del paciente.</span>
+          </div>
+          <span class="go" style="background:#0b4a3c">Entrar a Medical →</span>
+        </button>
+      </div>
+    </div>
+    <div id="v-especialidades" hidden style="display:flex;flex-direction:column;gap:36px">
+      <button class="link" data-modos style="align-self:flex-start">← Cambiar a Student / Medical</button>
+      <div style="display:flex;flex-direction:column;gap:12px;max-width:720px">
+        <div id="e-kicker" style="font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:#2e9e62;font-weight:700">Especialidades</div>
+        <h1 id="e-titulo" style="margin:0;font-size:clamp(30px,3.6vw,44px);line-height:1.1;font-weight:800;letter-spacing:-.02em">Guías clínicas y herramientas interactivas</h1>
+        <p id="e-sub" class="muted" style="font-size:17px">Selecciona una especialidad para acceder a sus guías de práctica clínica y herramientas de manejo del paciente.</p>
+      </div>
+      <div style="position:relative;max-width:720px;width:100%">
+        <svg aria-hidden="true" viewBox="0 0 24 24" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);width:20px;height:20px;fill:none;stroke:#557066;stroke-width:2.2;stroke-linecap:round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path></svg>
+        <input id="buscador" type="search" autocomplete="off" placeholder="Buscar una guía… ej. insuficiencia, potasio, asma" aria-label="Buscar una guía" style="width:100%;font:inherit;font-size:17px;padding:15px 44px 15px 46px;border-radius:14px;border:1.5px solid #d5e2db;background:#fff;color:#0f2e26;outline:none">
+        <button id="buscador-x" type="button" aria-label="Borrar búsqueda" hidden style="position:absolute;right:8px;top:50%;transform:translateY(-50%);border:0;background:#eef4f1;color:#0b4a3c;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;font-weight:700">×</button>
+      </div>
+      <div id="resultados" hidden style="display:flex;flex-direction:column;gap:12px"></div>
+      <div class="specs" id="lista-especialidades"></div>
+    </div>
+    <div id="v-especialidad" hidden style="display:flex;flex-direction:column;gap:24px"></div>
+    <div class="err" id="m-app"></div>
+  </main>
+  <footer style="padding:24px;border-top:1px solid #e3ebe7;font-size:13px;color:#7a938a;text-align:center;display:flex;flex-direction:column;gap:8px;align-items:center"><span>© 2026 MEDON · Herramienta de apoyo educativo. No reemplaza el juicio clínico.</span><span style="display:flex;gap:16px;flex-wrap:wrap;justify-content:center"><a href="/terminos/" style="color:#0b4a3c;font-weight:700">Términos y condiciones</a><a href="/privacidad/" style="color:#0b4a3c;font-weight:700">Política de privacidad</a></span></footer>
+</section>
+
+<script>
+document.querySelectorAll('input[type="password"]').forEach((inp) => {
+  const wrap = document.createElement('span'); wrap.className = 'pw';
+  inp.parentNode.insertBefore(wrap, inp); wrap.appendChild(inp);
+  const b = document.createElement('button'); b.type = 'button'; b.textContent = 'Ver'; b.setAttribute('aria-label', 'Mostrar contraseña');
+  b.addEventListener('click', () => { const show = inp.type === 'password'; inp.type = show ? 'text' : 'password'; b.textContent = show ? 'Ocultar' : 'Ver'; b.setAttribute('aria-label', show ? 'Ocultar contraseña' : 'Mostrar contraseña'); });
+  wrap.appendChild(b);
+});
+</script>
+<script type="module">
+import { sb, registrar, entrar, salir, recuperarClave, estado, pagar, gestionarSuscripcion } from '/medon.js';
+
+// ---- Especialidades y herramientas (agrega nuevas aquí) ----
+// ---- MedON Student (agrega guías en topics) ----
+const ESTUDIANTE = [
+  { id: 'semio', code: 'SEM', name: 'Semiología', desc: 'Anamnesis, examen físico por sistemas y signos clínicos.', h: 160, c: '#1D8446',
+    topics: [{ name: 'Semiología respiratoria', sub: 'Anatomía · Anamnesis · Inspección, palpación, percusión y auscultación · Síndromes · Signos de alarma', ruta: '/herramientas/semiologia-respiratoria/', recurso: 'semiologia-respiratoria' },
+      { name: 'Semiología cardiovascular', sub: 'Inspección · Palpación · Percusión · Auscultación · Focos · Valvulopatías · Congénitas', ruta: '/herramientas/semiologia-cardiovascular/', recurso: 'semiologia-cardiovascular' },
+      { name: 'Enfoque del paciente con dolor abdominal', sub: 'Historia clínica · Tipos de dolor · Abdomen agudo · Cuadrantes · Apendicitis · Hemorragia digestiva · Perlas', ruta: '/herramientas/dolor-abdominal/', recurso: 'dolor-abdominal' },
+      { name: 'Enfoque de la hemorragia digestiva desde la semiología', sub: 'Hemorragia alta y baja · Nivel del sangrado · Causas · Lesiones colónicas · Práctica', ruta: '/herramientas/hemorragia-digestiva/', recurso: 'hemorragia-digestiva' },
+      { name: 'Semiotecnia del abdomen', sub: 'Topografía · Inspección · Auscultación · Palpación · Percusión · Signos y maniobras · Práctica', ruta: '/herramientas/semiotecnia-abdomen/', recurso: 'semiotecnia-abdomen' },
+      { name: 'Dolor pélvico y hernias', sub: 'EPI · Ectópico · Torsión · Vaginitis (pH) · Diferencial · Hernias · Prototipo anatómico · Casos', ruta: '/herramientas/dolor-pelvico-hernias/', recurso: 'dolor-pelvico-hernias' },
+      { name: 'Enfoque del paciente con EPOC y asma', sub: 'Anamnesis · Fenotipos · Examen físico · Espirometría · EPOC exacerbado · Asma', ruta: '/herramientas/epoc-asma/', recurso: 'epoc-asma' }] },
+  { id: 'bioq', code: 'BIO', name: 'Bioquímica', desc: 'Metabolismo, enzimas y bases moleculares de la enfermedad.', h: 300, c: '#7b3fe4', topics: [
+      { name: 'Hiperbilirrubinemia', sub: 'Ciclo de la bilirrubina · Directa e indirecta · Hemólisis · Conjugación · Simulador de laboratorio', ruta: '/herramientas/hiperbilirrubinemia/', recurso: 'hiperbilirrubinemia' },
+      { name: 'Anemia desde la correlación clínica', sub: 'Clasificación · Metabolismo del hierro · B12 y folato · Hemólisis · Simuladores', ruta: '/herramientas/anemia/', recurso: 'anemia' },
+      { name: 'Metabolismo renal', sub: 'Nefrona en tiempo real · TFG · Creatinina · Urea y BUN · Ácido-base · ERC · Vitamina D · Energía renal · IRA · Diálisis', ruta: '/herramientas/metabolismo-renal/', recurso: 'metabolismo-renal' },
+      { name: 'Metabolismo tiroideo', sub: 'Yodo · Folículo tiroideo · Síntesis paso a paso · TPO · Hipotiroidismo · Hipertiroidismo · Patrones bioquímicos', ruta: '/herramientas/metabolismo-tiroideo/', recurso: 'metabolismo-tiroideo' },
+      { name: 'Metabolismo suprarrenal', sub: 'Zonas de la glándula · Esteroidogénesis · Eje hipotálamo-hipófisis-suprarrenal · Aldosterona · Catecolaminas · Patologías', ruta: '/herramientas/metabolismo-suprarrenal/', recurso: 'metabolismo-suprarrenal' },
+      { name: 'Cetogénesis y equilibrio ácido-base', sub: 'Cetogénesis · Cetólisis · CAD vs estado hiperosmolar · Gases arteriales y compensación', ruta: '/herramientas/cetogenesis/', recurso: 'cetogenesis' }] },
+  { id: 'farma', code: 'FAR', name: 'Farmacología', desc: 'Farmacocinética, farmacodinamia y grupos de medicamentos.', h: 28, c: '#b45309', topics: [
+      { name: 'Farmacocinética', sub: 'LADME animado · Absorción y pKa · Volumen de distribución · CYP450 e interacciones · Excreción renal · Curvas y dosis · Poblaciones especiales', ruta: '/herramientas/farmacocinetica/', recurso: 'farmacocinetica' },
+      { name: 'Farmacodinamia', sub: 'Dianas y 4 tipos de receptores animados · Ocupación y Kd · Potencia y eficacia · Antagonismo · Índice terapéutico · Tolerancia y rebote · Interacciones · Farmacogenómica', ruta: '/herramientas/farmacodinamia/', recurso: 'farmacodinamia' }] },
+  { id: 'psiq', code: 'PSI', name: 'Semiología psiquiátrica', desc: 'Entrevista, examen mental y signos de los trastornos psiquiátricos.', h: 200, c: '#1f6fb2', topics: [
+      { name: 'Trastornos depresivos y trastorno afectivo bipolar', sub: 'Afecto y ánimo · Sinapsis monoaminérgica interactiva · Antidepresivos · DSM-5 · Manía e hipomanía · Conducta suicida', ruta: '/herramientas/depresion-bipolar/', recurso: 'depresion-bipolar' },
+      { name: 'Trastornos del pensamiento y de la sensopercepción', sub: 'Examen mental · Alucinaciones · Delirios · Psicosis · Esquizofrenia (dopamina, glutamato, DSM-5, antipsicóticos) · Otros trastornos psicóticos', ruta: '/herramientas/trastornos-pensamiento/', recurso: 'trastornos-pensamiento' },
+      { name: 'Trastornos de ansiedad', sub: 'Miedo vs. ansiedad · Fisiopatología · Epidemiología en Colombia · TAG · Pánico · Agorafobia · Fobia social · TOC · TEPT · Fobias', ruta: '/herramientas/trastornos-ansiedad/', recurso: 'trastornos-ansiedad' },
+      { name: 'Examen mental directo', sub: 'Orden de las 10 partes · Preguntas para el paciente · Términos semiológicos · Informe que se redacta solo · 4 pacientes virtuales con calificación · DSM-5-TR · CIE-11', ruta: '/herramientas/examen-mental/', recurso: 'examen-mental' }] },
+];
+const MODOS = {
+  student: { lista: ESTUDIANTE, kicker: 'MedON Student', titulo: 'Ciencias básicas y clínicas', sub: 'Selecciona un área para estudiar con modelos y simuladores interactivos.' },
+  medical: { lista: null, kicker: 'MedON Medical · Especialidades', titulo: 'Guías clínicas y herramientas interactivas', sub: 'Selecciona una especialidad para acceder a sus guías de práctica clínica y herramientas de manejo del paciente.' },
+};
+let modo = null;
+const listaActual = () => (modo === 'student' ? ESTUDIANTE : ESPECIALIDADES);
+const ESPECIALIDADES = [
+  { id: 'cardio', code: 'CAR', name: 'Cardiología', desc: 'Insuficiencia cardiaca, arritmias, cardiopatía isquémica y manejo cardiovascular.', h: 15,
+    topics: [{ name: 'Reanimación cardiopulmonar (RCP)', sub: 'Simulador paso a paso · Desfibrilables y no desfibrilables · Compresiones · 5H y 5T · Dosis', ruta: '/herramientas/rcp/', recurso: 'rcp' },
+      { name: 'Bloqueos de rama y hemibloqueos', sub: 'BRD · BRI · Hemibloqueo anterosuperior y posteroinferior · EKG interactivo y eje', ruta: '/herramientas/bloqueos-rama/', recurso: 'bloqueos-rama' },
+      { name: 'Bradiarritmias', sub: 'Bradicardia sinusal · BAV 1.º, Mobitz I y II, BAV completo · Ritmos animados · Marcapasos transvenoso', ruta: '/herramientas/bradiarritmias/', recurso: 'bradiarritmias' },
+      { name: 'Insuficiencia cardiaca', sub: 'Guía de práctica clínica · Herramienta interactiva', ruta: '/herramientas/insuficiencia-cardiaca/', recurso: 'insuficiencia-cardiaca' },
+      { name: 'Taquiarritmias supraventriculares y FA', sub: 'TSV ESC 2019 · Antiarrítmicos y potencial de acción · FA ESC 2024 · Simulador ECG y calculadoras', ruta: '/herramientas/arritmias-supraventriculares/', recurso: 'arritmias-supraventriculares' },
+      { name: 'Hipertensión arterial', sub: 'ESC 2024 · AHA/ACC 2025 · Colombia · Eje renina-angiotensina-aldosterona · Emergencia hipertensiva · Dosis y simulador', ruta: '/herramientas/hipertension-arterial/', recurso: 'hipertension-arterial' },
+      { name: 'Síncope', sub: 'ESC 2018 · Reflejo · Ortostático · Cardiaco · Simulador hemodinámico · Riesgo en urgencias · Tratamiento', ruta: '/herramientas/sincope/', recurso: 'sincope' },
+      { name: 'Cardiopatía isquémica', sub: 'Angina estable · SCASEST · SCACEST · Simuladores, TIMI, GRACE, HEART y trombolíticos', ruta: '/herramientas/cardiopatia-isquemica/', recurso: 'cardiopatia-isquemica' }] },
+  { id: 'neumo', code: 'NEU', name: 'Neumología', desc: 'Enfermedad respiratoria y ventilación.', h: 235, topics: [
+      { name: 'EPOC · GOLD 2026', sub: 'Espirometría animada · GOLD 1–4 · Grupos A, B, E · Tratamiento y dosis · Exacerbación', ruta: '/herramientas/epoc/', recurso: 'epoc' },
+      { name: 'Asma · GINA 2026', sub: 'Clínica · Espirometría y reversibilidad · Control · Pasos Vía 1 y 2 · Dosis de ICS · Crisis por peso · Biológicos · Técnica inhalatoria', ruta: '/herramientas/asma/', recurso: 'asma' },
+      { name: 'Neumonía adquirida en la comunidad', sub: 'Fisiopatología interactiva · Etiología · CURB-65 · PSI · ATS/IDSA · Riesgo MDR · Tratamiento · Complicaciones', ruta: '/herramientas/neumonia/', recurso: 'neumonia' },
+      { name: 'Enfoque del derrame pleural', sub: 'Starling interactivo · Clínica por volumen · Rx · Criterios de Light · Exudado vs. trasudado · ACCP · Empiema · Drenaje · Tratamiento', ruta: '/herramientas/derrame-pleural/', recurso: 'derrame-pleural' },
+      { name: 'Tromboembolismo pulmonar', sub: 'Categorías AHA/ACC 2026 · Wells · PESI · Diagnóstico · Tratamiento · Calculadora DOAC · Trombolisis · TVP · Simulador', ruta: '/herramientas/tep/', recurso: 'tep' },
+      { name: 'Hipertensión pulmonar', sub: 'Definición · Eco y PSAP · Grupos 1–5 · Clínica · Tratamiento por grupo · Riesgo · Oxígeno domiciliario', ruta: '/herramientas/hipertension-pulmonar/', recurso: 'hipertension-pulmonar' }] },
+  { id: 'nefro', code: 'NEF', name: 'Nefrología', desc: 'Fisiología renal, líquidos, electrolitos y enfermedad renal.', h: 185,
+    topics: [{ name: 'Fisiología de la nefrona', sub: 'Filtración · Reabsorción · Secreción · Excreción · Flujo de electrolitos animado · Diuréticos, ADH y aldosterona', ruta: '/herramientas/fisiologia-nefrona/', recurso: 'fisiologia-nefrona' },
+      { name: 'Lesión renal aguda', sub: 'KDIGO 2026 · Estadios C·U·B · Etiología · FENa/FEUrea · Protección renal · Terapia de reemplazo · Simulador', ruta: '/herramientas/lesion-renal-aguda/', recurso: 'lesion-renal-aguda' },
+      { name: 'Enfermedad renal crónica', sub: 'Hiperkalemia y acidemia animadas · CKD-EPI · Mapa KDIGO · KFRE · Tratamiento · Indicaciones de TRR · Simulador de hemodiálisis y diálisis peritoneal', ruta: '/herramientas/enfermedad-renal-cronica/', recurso: 'enfermedad-renal-cronica' },
+      { name: 'Trastornos del potasio', sub: 'Hiperpotasemia · Hipopotasemia · Prototipo renal · ECG dinámico · Tratamiento UKKA · Calculadora de infusión de KCl', ruta: '/herramientas/trastornos-potasio/', recurso: 'trastornos-potasio' },
+      { name: 'Trastornos del sodio', sub: 'Hiponatremia · Hipernatremia · Prototipo ADH · SIADH · Calculadoras de infusión · Desmielinización osmótica', ruta: '/herramientas/trastornos-sodio/', recurso: 'trastornos-sodio' }] },
+  { id: 'endo', code: 'END', name: 'Endocrinología', desc: 'Diabetes, tiroides y metabolismo.', h: 65,
+    topics: [{ name: 'Diabetes mellitus', sub: 'Fisiopatología · Diagnóstico · Tratamiento ADA 2026 · Insulinización · Hospital · Consulta', ruta: '/herramientas/diabetes/', recurso: 'diabetes' },
+      { name: 'Complicaciones agudas de la diabetes', sub: 'CAD y SHH · Tabla interactiva · Líquidos, potasio e insulina · Simulador con gases y osmolaridad', ruta: '/herramientas/complicaciones-diabetes/', recurso: 'complicaciones-diabetes' },
+      { name: 'Trastornos del calcio', sub: 'Metabolismo del calcio y vitamina D · Hipercalcemia · Hipocalcemia · Calcio corregido · Algoritmos · Dosis', ruta: '/herramientas/trastornos-calcio/', recurso: 'trastornos-calcio' },
+      { name: 'Trastornos tiroideos', sub: 'Fisiología animada · Hipotiroidismo · Hipertiroidismo · Intérprete TSH/T4 · Levotiroxina y metimazol · Tormenta y coma · Simulador de consulta', ruta: '/herramientas/trastornos-tiroideos/', recurso: 'trastornos-tiroideos' }] },
+  { id: 'anes', code: 'ANE', name: 'Anestesiología', desc: 'Vía aérea, sedación y perioperatorio.', h: 290,
+    topics: [{ name: 'Secuencia de intubación rápida', sub: 'Paso a paso con cronómetro · Dosis por peso · Goteos de sedoanalgesia', ruta: '/herramientas/secuencia-intubacion/', recurso: 'secuencia-intubacion' },
+      { name: 'Ventilación mecánica en UCI', sub: 'Simulador de ventilador · Curvas en vivo · Ventilación protectora · Fisiología para dummies', ruta: '/herramientas/ventilacion-mecanica/', recurso: 'ventilacion-mecanica' },
+      { name: 'Anestésicos locales', sub: 'Mecanismo animado · Ésteres y amidas · RAM y LAST · Emulsión lipídica · Calculadora de dosis máxima y tóxica', ruta: '/herramientas/anestesicos-locales/', recurso: 'anestesicos-locales' }] },
+  { id: 'pedi', code: 'PED', name: 'Pediatría', desc: 'Manejo del paciente pediátrico.', h: 200, topics: [
+      { name: 'AIEPI interactivo', sub: 'Signos de peligro · Respiratorio · Diarrea · Fiebre y dengue · Nutrición · Menor de 2 meses · Dosis por peso', ruta: '/herramientas/aiepi/', recurso: 'aiepi' },
+      { name: 'Asma en Pediatría · GINA 2026', sub: '≤ 5 años · 6–11 años · Adolescentes · Diagnóstico · Control · Pasos · Dosis de ICS · Crisis por peso · Biológicos · Técnica inhalatoria', ruta: '/herramientas/asma-pediatria/', recurso: 'asma-pediatria' },
+      { name: 'Neumonía en pediatría', sub: 'Fisiopatología dinámica · Clasificación OMS · Bacterial Pneumonia Score · Rx simulada · Tratamiento por edad', ruta: '/herramientas/neumonia-pediatria/', recurso: 'neumonia-pediatria' },
+      { name: 'Bronquiolitis', sub: 'Fisiopatología dinámica · Epidemiología · Etiología · Wood-Downes-Ferrés · Tal · Calculadora de soporte · Nirsevimab y palivizumab', ruta: '/herramientas/bronquiolitis/', recurso: 'bronquiolitis' },
+      { name: 'Fibrosis quística', sub: 'Herencia · Clases de variantes CFTR animadas · Epitelio y conductos dinámicos · Algoritmo CFF · Shwachman · Fuchs · Moduladores y dosis por peso', ruta: '/herramientas/fibrosis-quistica/', recurso: 'fibrosis-quistica' },
+      { name: 'Síndrome nefrítico', sub: 'Glomérulo animado: inmunocomplejos, C3, hematuria y proteinuria · Nefrona y HTA por volumen · Sedimento · Schwartz · KDIGO · PA AAP 2017 · Dosis por peso', ruta: '/herramientas/sindrome-nefritico/', recurso: 'sindrome-nefritico' },
+      { name: 'Síndrome nefrótico', sub: 'Podocito paso a paso · Proteinuria selectiva · Edema (Starling) · Clasificador KDIGO 2025 · FENa · Calendario de prednisona · Ahorradores de corticoide', ruta: '/herramientas/sindrome-nefrotico/', recurso: 'sindrome-nefrotico' },
+      { name: 'Infección de vías urinarias', sub: 'Vía urinaria animada · Diagnóstico por edad · Simulador de urocultivo · Primera IVU (AAP 2026, NICE, EAU) · Reflujo vesicoureteral animado I–V · Dosis por peso con resistencia local', ruta: '/herramientas/ivu-pediatria/', recurso: 'ivu-pediatria' },
+      { name: 'Enfermedad diarreica aguda', sub: 'Enterocito animado · Etiología · AIEPI interactivo de diarrea · Planes A, B y C por peso · Zinc · Antibióticos por causa', ruta: '/herramientas/eda-pediatria/', recurso: 'eda-pediatria' },
+      { name: 'Convulsiones y estado epiléptico', sub: 'Sinapsis animada · Convulsión febril simple, compleja y plus · Epilepsia ILAE 2025 · Simulador por minutos con dosis hasta intubación', ruta: '/herramientas/convulsiones-pediatria/', recurso: 'convulsiones-pediatria' }] },
+  { id: 'mleg', code: 'MLG', name: 'Medicina legal', desc: 'Urgencias médico-legales y rutas de atención.', h: 350,
+    topics: [{ name: 'Código Fucsia', sub: 'Violencia sexual en urgencias · Ruta · Profilaxis < 72 h · Plantilla de historia clínica', ruta: '/herramientas/codigo-fucsia/', recurso: 'codigo-fucsia' }] },
+  { id: 'infe', code: 'INF', name: 'Infectología', desc: 'Antibioticoterapia y enfermedades infecciosas.', h: 155, topics: [
+      { name: 'Simulador de antibiograma', sub: 'CIM · Patrones de resistencia (MRSA, BLEE, KPC, NDM, DTR, CRAB) · Tratamiento con dosis por peso', ruta: '/herramientas/antibiograma/', recurso: 'antibiograma' }] },
+  { id: 'toxi', code: 'TOX', name: 'Toxicología', desc: 'Intoxicaciones, toxíndromes y antídotos.', h: 40, topics: [
+      { name: 'Toxíndromes', sub: 'Tipos · Mnemotecnias · Diferencial · Estudios · Antídotos y dosis por peso · Comparar · Simulador · ES · EN · PT', ruta: '/herramientas/toxindromes/', recurso: 'toxindromes' }] },
+];
+const PRECIOS = {
+  mercadopago_auto: { mensual: ['$79.900', 'COP / mes'], anual: ['$671.900', 'COP / año'], nota: 'Se renueva automáticamente · Cancela cuando quieras' },
+  mercadopago: { mensual: ['$79.900', 'COP / mes'], anual: ['$671.900', 'COP / año'], nota: 'Pago único por el periodo elegido · Sin cobros automáticos' },
+};
+
+const TEMPORALES = ['mailinator.com','guerrillamail.com','sharklasers.com','10minutemail.com','temp-mail.org','tempmail.com','temp-mail.io','yopmail.com','throwawaymail.com','trashmail.com','getnada.com','dispostable.com','maildrop.cc','mohmal.com','emailondeck.com','fakeinbox.com','burnermail.io','mail.tm','mail.gw','1secmail.com','dropmail.me','minuteinbox.com','emailtemporal.org','correotemporal.org','tempinbox.com','mytemp.email','tempr.email','discard.email','emailfake.com'];
+let plan = 'anual', metodo = 'mercadopago_auto', info = null;
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const color = h => `oklch(0.52 0.11 ${h})`;
+
+function ver(id) {
+  $$('section.screen').forEach(s => s.hidden = s.id !== 's-' + id);
+  if (id === 'pago') pintarPago();
+  scrollTo(0, 0);
+}
+function msg(form, texto, ok) { const m = $('[data-msg]', form); m.textContent = texto || ''; m.className = ok ? 'ok' : 'err'; }
+function traducir(e) {
+  const t = (e && e.message) || '';
+  if (/Invalid login/i.test(t)) return 'Correo o contraseña incorrectos.';
+  if (/not confirmed/i.test(t)) return 'Primero confirma tu correo con el enlace que te enviamos.';
+  if (/already registered/i.test(t)) return 'Ese correo ya tiene cuenta. Inicia sesión.';
+  if (/Password/i.test(t)) return 'La contraseña debe tener al menos 6 caracteres.';
+  if (/rate limit|seconds/i.test(t)) return 'Demasiados intentos. Espera unos minutos e intenta de nuevo.';
+  if (/correo_temporal/i.test(t)) return 'No se aceptan correos temporales. Usa tu correo personal o institucional.';
+  if (/Database error/i.test(t)) return 'No pudimos crear tu cuenta. Escríbenos para ayudarte.';
+  return 'Ocurrió un error. Intenta de nuevo.';
+}
+async function cargando(btn, fn) { btn.disabled = true; try { await fn(); } finally { btn.disabled = false; } }
+
+async function enrutar() {
+  info = await estado();
+  const email = info.usuario?.email || '';
+  $$('[data-email]').forEach(e => e.textContent = email);
+  const meta = info.usuario?.user_metadata || {};
+  const nombre = (meta.full_name || meta.nombre || meta.name || '').trim();
+  $$('[data-name]').forEach(e => { e.textContent = nombre || email; e.title = email; });
+  if (!info.sesion) return ver('login');
+  const sus = info.suscripcion;
+  const fin = $('#m-finprueba');
+  fin.hidden = info.activo || !(sus?.status === 'trialing' || !sus);
+  fin.textContent = sus ? 'Tu prueba gratis terminó' : 'La prueba gratis ya se usó en este equipo o con este correo';
+  if (!info.activo) return ver('planes');
+  $('#b-portal').hidden = !(sus?.provider === 'mercadopago' && sus?.provider_customer_id);
+  const enPrueba = sus?.status === 'trialing' && !sus?.provider;
+  $('#b-prueba').hidden = !enPrueba;
+  if (enPrueba) {
+    const h = Math.max(0, Math.ceil((new Date(sus.current_period_end) - Date.now()) / 36e5));
+    $('#t-prueba').textContent = h > 24 ? `Prueba gratis · Te quedan ${Math.ceil(h / 24)} días` : `Prueba gratis · Te quedan ${h} horas`;
+  }
+  ver('app'); modo ? pintarEspecialidades() : pintarModos();
+}
+
+// ---- Navegación ----
+$$('[data-ir]').forEach(b => b.addEventListener('click', () => ver(b.dataset.ir)));
+$$('[data-salir]').forEach(b => b.addEventListener('click', () => salir()));
+$$('[data-inicio]').forEach(b => b.addEventListener('click', pintarModos));
+$$('[data-modos]').forEach(b => b.addEventListener('click', pintarModos));
+$$('[data-modo]').forEach(b => b.addEventListener('click', () => { modo = b.dataset.modo; try { sessionStorage.setItem('medon-modo', modo); } catch {} pintarEspecialidades(); scrollTo(0, 0); }));
+try { modo = sessionStorage.getItem('medon-modo'); } catch {}
+function pintarModos() {
+  modo = null; try { sessionStorage.removeItem('medon-modo'); } catch {}
+  $('#v-modo').hidden = false; $('#v-especialidades').hidden = true; $('#v-especialidad').hidden = true; scrollTo(0, 0);
+}
+
+// ---- Login / registro ----
+$('#f-login').addEventListener('submit', e => {
+  e.preventDefault(); const f = e.target;
+  cargando($('button[type=submit]', f), async () => {
+    try { msg(f); await entrar(f.email.value.trim(), f.clave.value); await enrutar(); } catch (err) { msg(f, traducir(err)); }
+  });
+});
+$('#b-olvide').addEventListener('click', async () => {
+  const f = $('#f-login'), email = f.email.value.trim();
+  if (!email) return msg(f, 'Escribe tu correo arriba y vuelve a tocar "¿Olvidaste tu contraseña?".');
+  try { await recuperarClave(email); msg(f, 'Te enviamos un enlace para cambiar tu contraseña.', true); } catch (err) { msg(f, traducir(err)); }
+});
+$('#f-registro').addEventListener('submit', e => {
+  e.preventDefault(); const f = e.target;
+  cargando($('button[type=submit]', f), async () => {
+    try {
+      msg(f);
+      const dom = f.email.value.trim().toLowerCase().split('@')[1] || '';
+      if (TEMPORALES.some(d => dom === d || dom.endsWith('.' + d))) return msg(f, 'No se aceptan correos temporales. Usa tu correo personal o institucional.');
+      await registrar(f.nombre.value.trim(), f.email.value.trim(), f.clave.value);
+      const { data } = await sb.auth.getSession();
+      data.session ? await enrutar() : ver('confirma');
+    } catch (err) { msg(f, traducir(err)); }
+  });
+});
+$('#f-nuevaclave').addEventListener('submit', e => {
+  e.preventDefault(); const f = e.target;
+  cargando($('button[type=submit]', f), async () => {
+    const { error } = await sb.auth.updateUser({ password: f.clave.value });
+    if (error) return msg(f, traducir(error));
+    history.replaceState(null, '', '/'); await enrutar();
+  });
+});
+sb.auth.onAuthStateChange(ev => { if (ev === 'PASSWORD_RECOVERY') ver('nuevaclave'); });
+
+// ---- Planes y pago ----
+$$('[data-plan]').forEach(b => b.addEventListener('click', () => {
+  plan = b.dataset.plan; $$('[data-plan]').forEach(x => x.classList.toggle('sel', x === b));
+}));
+$$('[data-metodo]').forEach(b => b.addEventListener('click', () => {
+  metodo = b.dataset.metodo; $$('[data-metodo]').forEach(x => x.classList.toggle('sel', x === b)); pintarPago();
+}));
+function pintarPago() {
+  const p = PRECIOS[metodo], [precio, per] = p[plan];
+  $('#r-plan').textContent = 'Plan ' + (plan === 'anual' ? 'Anual' : 'Mensual');
+  $('#r-precio').textContent = precio;
+  $('#r-total').textContent = `${precio} ${per}`;
+  $('#r-nota').textContent = p.nota;
+  $('#b-pagar').textContent = metodo === 'mercadopago_auto' ? 'Suscribirme con tarjeta' : 'Pagar con Mercado Pago';
+  $('#m-pago').textContent = '';
+}
+$('#b-pagar').addEventListener('click', e => cargando(e.target, async () => {
+  try { e.target.textContent = 'Abriendo pago seguro…'; await pagar(plan, metodo); }
+  catch (err) {
+    let det = '';
+    try { const j = await err.context.json(); det = JSON.stringify(j.detalle?.message || j.detalle || j.error || j).slice(0, 200); } catch { det = String(err?.message || err); }
+    pintarPago(); $('#m-pago').textContent = 'No pudimos abrir el pago. Detalle: ' + det;
+  }
+}));
+$('#b-portal').addEventListener('click', async () => {
+  if (!confirm('¿Cancelar la renovación automática? Conservas el acceso hasta el final del periodo pagado.')) return;
+  try { await gestionarSuscripcion(); alert('Listo. No se harán más cobros. Tu acceso sigue activo hasta el final del periodo.'); enrutar(); }
+  catch { alert('No pudimos cancelar. Escríbenos a soporte@medonclinic.net'); }
+});
+$('#b-suscribir').addEventListener('click', () => ver('planes'));
+
+async function esperarActivacion() {
+  ver('pagook');
+  for (let i = 0; i < 15; i++) {
+    info = await estado();
+    if (info.activo && info.suscripcion?.status === 'active') {
+      $('#m-pagook').textContent = 'Tu plan está activo. Ya tienes acceso completo a MEDON.';
+      $('#b-entrar').hidden = false; return;
+    }
+    await new Promise(r => setTimeout(r, 2000));
+  }
+  $('#m-pagook').textContent = 'Tu pago se está procesando. Si pagaste con PSE puede tardar unos minutos; vuelve a entrar más tarde.';
+  $('#b-entrar').hidden = false;
+}
+$('#b-entrar').addEventListener('click', () => { history.replaceState(null, '', '/'); enrutar(); });
+
+// ---- Plataforma ----
+function pintarEspecialidades() {
+  const M = MODOS[modo] || MODOS.medical;
+  $('#e-kicker').textContent = M.kicker; $('#e-titulo').textContent = M.titulo; $('#e-sub').textContent = M.sub;
+  $('#v-modo').hidden = true; $('#v-especialidades').hidden = false; $('#v-especialidad').hidden = true;
+  $('#lista-especialidades').innerHTML = listaActual().map(s => `
+    <button class="spec" data-esp="${s.id}" style="background:${s.c || color(s.h)}">
+      <div style="display:flex;justify-content:space-between;align-items:center;width:100%">
+        <span style="font-size:13px;font-weight:700;letter-spacing:.1em;opacity:.85">${s.code}</span>
+        <span style="font-size:12px;font-weight:700;padding:5px 11px;border-radius:999px;background:rgba(255,255,255,.18)">${s.topics.length ? s.topics.length + ' guía' + (s.topics.length > 1 ? 's' : '') : 'Próximamente'}</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <span style="font-size:26px;font-weight:800">${s.name}</span>
+        <span style="font-size:15px;opacity:.88;line-height:1.45">${s.desc}</span>
+      </div>
+    </button>`).join('');
+  $$('[data-esp]').forEach(b => b.addEventListener('click', () => pintarEspecialidad(b.dataset.esp)));
+  if (typeof buscar === 'function') buscar($('#buscador').value);
+}
+// ---- Buscador de guías (Medical + Student) ----
+const norm = t => (t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+function todasLasGuias() {
+  const out = [];
+  [['medical', ESPECIALIDADES], ['student', ESTUDIANTE]].forEach(([m, lista]) => (lista || []).forEach(s => (s.topics || []).forEach((t, i) => out.push({ m, s, t, i }))));
+  return out;
+}
+function buscar(q) {
+  const box = $('#resultados'), grid = $('#lista-especialidades'), x = $('#buscador-x');
+  const palabras = norm(q).trim().split(/\s+/).filter(Boolean);
+  x.hidden = !palabras.length;
+  if (!palabras.length) { box.hidden = true; grid.hidden = false; return; }
+  const hits = todasLasGuias().map(g => {
+    const n = norm(g.t.name), all = n + ' ' + norm(g.t.sub) + ' ' + norm(g.s.name);
+    if (!palabras.every(p => all.includes(p))) return null;
+    const score = palabras.reduce((a, p) => a + (n.startsWith(p) ? 4 : n.includes(p) ? 2 : 0), 0) + (g.m === modo ? 1 : 0);
+    return { ...g, score };
+  }).filter(Boolean).sort((a, b) => b.score - a.score);
+  grid.hidden = true; box.hidden = false;
+  box.innerHTML = '<div class="muted" style="font-size:14px">' + (hits.length ? hits.length + ' guía' + (hits.length > 1 ? 's' : '') + ' encontrada' + (hits.length > 1 ? 's' : '') : 'No encontramos guías con "' + q.replace(/[<>&"]/g, '') + '". Prueba con otra palabra.') + '</div>' +
+    hits.map((g, k) => `
+    <button class="topic" data-hit="${k}">
+      <div style="display:flex;align-items:center;gap:18px;min-width:0">
+        <span style="width:12px;height:12px;border-radius:50%;background:${g.s.c || color(g.s.h)};flex-shrink:0"></span>
+        <div style="display:flex;flex-direction:column;gap:4px;min-width:0">
+          <span style="font-size:12px;font-weight:700;letter-spacing:.08em;color:${g.s.c || color(g.s.h)}">${g.m === 'student' ? 'STUDENT' : 'MEDICAL'} · ${g.s.name.toUpperCase()}</span>
+          <span style="font-size:19px;font-weight:700">${g.t.name}</span><span class="muted" style="font-size:14px">${g.t.sub}</span>
+        </div>
+      </div>
+      <span style="font-size:14px;font-weight:700;padding:10px 18px;border-radius:10px;background:#0b4a3c;color:#fff;white-space:nowrap">Abrir →</span>
+    </button>`).join('');
+  $$('[data-hit]', box).forEach(b => b.addEventListener('click', () => abrir(hits[+b.dataset.hit].t)));
+}
+$('#buscador').addEventListener('input', e => buscar(e.target.value));
+$('#buscador').addEventListener('keydown', e => { if (e.key === 'Escape') { e.target.value = ''; buscar(''); } });
+$('#buscador-x').addEventListener('click', () => { $('#buscador').value = ''; buscar(''); $('#buscador').focus(); });
+function pintarEspecialidad(id) {
+  const s = listaActual().find(x => x.id === id);
+  const v = $('#v-especialidad');
+  $('#v-especialidades').hidden = true; v.hidden = false;
+  v.innerHTML = `
+    <button class="link" data-volver style="align-self:flex-start">← ${modo === 'student' ? 'Todas las áreas de Student' : 'Todas las especialidades'}</button>
+    <div style="border-radius:24px;padding:clamp(28px,4vw,48px);background:${s.c || color(s.h)};color:#fff;display:flex;flex-direction:column;gap:10px">
+      <span style="font-size:13px;font-weight:700;letter-spacing:.14em;opacity:.85">${s.code}</span>
+      <h1 style="margin:0;font-size:clamp(32px,4vw,48px);font-weight:800">${s.name}</h1>
+      <p style="margin:0;font-size:17px;opacity:.9">${s.desc}</p>
+    </div>
+    ${s.topics.length ? s.topics.map((t, i) => `
+      <button class="topic" data-topic="${i}">
+        <div style="display:flex;align-items:center;gap:18px">
+          <span style="width:12px;height:12px;border-radius:50%;background:${s.c || color(s.h)};flex-shrink:0"></span>
+          <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:20px;font-weight:700">${t.name}</span><span class="muted" style="font-size:14px">${t.sub}</span></div>
+        </div>
+        <span style="font-size:14px;font-weight:700;padding:10px 18px;border-radius:10px;background:${modo === 'student' ? (s.c || '#0b4a3c') : '#0b4a3c'};color:#fff;white-space:nowrap">Abrir herramienta →</span>
+      </button>`).join('') : `<div style="padding:40px 28px;border-radius:16px;border:1.5px dashed #cddbd4;text-align:center;color:#557066">Contenido en preparación. Próximamente nuevas guías y herramientas.</div>`}`;
+  $('[data-volver]', v).addEventListener('click', pintarEspecialidades);
+  $$('[data-topic]', v).forEach(b => b.addEventListener('click', () => abrir(s.topics[+b.dataset.topic])));
+}
+function idDispositivo() {
+  // Un solo id por navegador: se toma de la cookie (compartida entre www y sin www) o de localStorage
+  const c = (document.cookie.match(/(?:^|; )medon_device=([^;]+)/) || [])[1];
+  let id = c || localStorage.getItem('medon_device');
+  if (!id) id = crypto.randomUUID();
+  localStorage.setItem('medon_device', id);
+  return id;
+}
+const DOM = /(^|\.)medonclinic\.net$/.test(location.hostname) ? '; Domain=medonclinic.net' : '';
+let abriendo = false;
+async function abrir(t) {
+  if (abriendo) return; abriendo = true;
+  $('#m-app').textContent = '';
+  const seg = location.protocol === 'https:' ? '; Secure' : '';
+  try {
+    // Sesión fresca para que el servidor la acepte (el token vence cada hora)
+    let { data: { session } } = await sb.auth.getSession();
+    if (!session || session.expires_at * 1000 - Date.now() < 5 * 60e3) ({ data: { session } } = await sb.auth.refreshSession());
+    if (!session) { abriendo = false; return ver('login'); }
+    document.cookie = `medon_token=${encodeURIComponent(session.access_token)}; Path=/; Max-Age=${Math.max(60, session.expires_at - Math.floor(Date.now() / 1000))}; SameSite=Lax${seg}`;
+    document.cookie = `medon_device=${idDispositivo()}; Path=/; Max-Age=31536000; SameSite=Lax${seg}${DOM}`;
+    // El servidor (middleware) registra el equipo y verifica el acceso al abrir la ruta
+    location.href = t.ruta;
+  } catch (e) {
+    abriendo = false;
+    const m = 'No pudimos abrir la herramienta. Intenta de nuevo.'; $('#m-app').textContent = m; alert(m);
+  }
+}
+window.addEventListener('pageshow', () => { abriendo = false; });
+
+// ---- Inicio ----
+const q = new URLSearchParams(location.search);
+if (q.get('pago') === 'ok' || q.get('pago') === 'pendiente') esperarActivacion();
+else if (location.hash.includes('type=recovery')) ver('nuevaclave');
+else enrutar().then(() => {
+  if (q.get('pantalla') === 'planes' && info.sesion && !info.activo) ver('planes');
+  if (!info.sesion && !q.get('pantalla') && !q.get('error') && !q.get('abrir')) { location.replace('/inicio/'); return; }
+  if (q.get('pantalla') === 'registro' && !info.sesion) ver('registro');
+  if (q.get('pantalla') === 'login' && !info.sesion) ver('login');
+  const ERR = { dispositivos: 'Tu cuenta cambió de equipo muchas veces hoy. Escríbenos a soporte@medonclinic.net y la activamos de inmediato.', verificacion: 'No pudimos verificar tu acceso. Intenta de nuevo en unos segundos.' };
+  if (false) {
+  } else if (ERR[q.get('error')]) { history.replaceState(null, '', '/'); setTimeout(() => alert(ERR[q.get('error')]), 300); }
+  const ruta = q.get('abrir');
+  if (ruta && info.activo) {
+    history.replaceState(null, '', '/');
+    const t = ESPECIALIDADES.flatMap(s => s.topics).find(x => x.ruta === ruta);
+    if (t) abrir(t);
+  }
+});
+</script>
+</body>
+</html>
